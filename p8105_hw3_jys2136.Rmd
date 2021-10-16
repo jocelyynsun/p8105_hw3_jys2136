@@ -13,6 +13,67 @@ library(p8105.datasets)
 ```
 
 
+# Problem 1
+
+## Instacart Data
+```{r, instacart_aisle_count, echo = TRUE, message = FALSE}
+
+data("instacart")
+
+# Finding the number of aisles in instacart:
+n_aisle = 
+  instacart %>%
+  count(aisle) %>%
+  arrange(desc(n))
+
+
+# Looking at the first few rows of data to see which aisles(s) are the most items ordered from:
+head(n_aisle, 5)
+
+```
+
+#### Data description
+The data set "instacart" has has `r ncol(instacart)` variables and `r nrow(instacart)` observations. 
+
+There are `r nrow(n_aisle)` aisles and as we can see in the output provided above. The aisles where the most items are ordered from are "fresh vegetables" and "fresh fruits".
+
+#### Visualizing the number of items ordered in each aisle
+```{r, aisle_plot, echo = FALSE, message = FALSE}
+
+aisle_plot = 
+  n_aisle %>%
+  filter(n > 10000) %>%
+  mutate(
+    aisle = factor(aisle),
+    aisle = fct_reorder(aisle,n)) %>%
+  ggplot(
+    aes(x = aisle, y = n)) +
+    labs(y = "No. of Items Ordered", x = "Aisle Name") +
+    geom_bar(stat = "identity", fill = "steelblue") +
+    theme_bw() + 
+    theme(axis.text.x = element_text(family = "Helvetica",
+                                     size = 9, 
+                                     angle = 60, 
+                                     hjust = 1),
+          axis.text.y = element_text(family = "Helvetica"))
+
+ggsave("aisle_plot.pdf", aisle_plot, width = 8, height = 5)
+    
+```
+
+
+```{r, three_popular_items, message = FALSE}
+
+
+
+```
+
+
+Make a table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. Include the number of times each item is ordered in your table.
+
+
+Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
+
 
 
 
