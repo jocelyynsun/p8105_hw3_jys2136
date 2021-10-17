@@ -16,6 +16,8 @@ library(p8105.datasets)
 # Problem 1
 
 ## Instacart Data
+
+#### Most popular aisles and number of ordered items
 ```{r, instacart_aisle_count, echo = TRUE, message = FALSE}
 
 data("instacart")
@@ -33,12 +35,13 @@ head(n_aisle, 5)
 ```
 
 #### Data description
-The data set "instacart" has has `r ncol(instacart)` variables and `r nrow(instacart)` observations. 
+The data set _instacart_ has has `r ncol(instacart)` variables and `r nrow(instacart)` observations. 
 
-There are `r nrow(n_aisle)` aisles and as we can see in the output provided above. The aisles where the most items are ordered from are "fresh vegetables" and "fresh fruits".
+There are `r nrow(n_aisle)` aisles and as we can see in the output provided above, the aisles where the most items are ordered from are "fresh vegetables" and "fresh fruits", with `r n_aisle[1,2]` number of items being ordered from "fresh vegetables" and `r n_aisle[2,2]` number of items being ordered from "fresh fruits".
 
-#### Visualizing the number of items ordered in each aisle
-```{r, aisle_plot, echo = FALSE, message = FALSE}
+
+#### Visualizing aisles with  > 10,000 items ordered
+```{r, aisle_plot, echo = FALSE}
 
 aisle_plot = 
   n_aisle %>%
@@ -48,7 +51,8 @@ aisle_plot =
     aisle = fct_reorder(aisle,n)) %>%
   ggplot(
     aes(x = aisle, y = n)) +
-    labs(y = "No. of Items Ordered", x = "Aisle Name") +
+    labs(y = "No. of Items Ordered",
+         x = "Aisle Name") +
     geom_bar(stat = "identity", fill = "steelblue") +
     theme_bw() + 
     theme(axis.text.x = element_text(family = "Helvetica",
@@ -57,22 +61,46 @@ aisle_plot =
                                      hjust = 1),
           axis.text.y = element_text(family = "Helvetica"))
 
+aisle_plot
+
 ggsave("aisle_plot.pdf", aisle_plot, width = 8, height = 5)
     
 ```
 
+**need to add figure legend**
+The graph above shows the number of items ordered among aisles that have over 10,000 items ordered, respectively. The frequency of ordered items according to aisle category are ordered from least to greatest, left to right. We can see that the most popular aisles are "fresh vegetables" and "fresh fruits". This is consistent with the findings in the section on [Most popular aisles and number of ordered items].
 
-```{r, three_popular_items, message = FALSE}
+
+#### Visualizing the most popular items in the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”
+```{r, three_popular_items, echo = FALSE}
+
+pop_aisles =
+  instacart %>%
+  filter(aisle == c("baking ingredients", 
+                    "dog food care", 
+                    "packaged vegetable fruits")) %>%
+  group_by(aisle) %>%
+  count(product_name) %>%
+  rename("frequency" = n) %>%
+  mutate(product_rank =  min_rank(desc(frequency))) %>%
+  filter(product_rank < 4) %>%
+  arrange(aisle, product_rank)
+  
+ knitr::kable(pop_aisles, caption = "**Table 1: Most popular items in the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”**") 
+
+```
+
+The table above shows the most popular items in the specified aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. In the _instacart_ dataset, We can see that there is no data on aisle “packaged vegetables fruits”. There is data on aisles "baking ingredients" and "dog food care". The most popular product in "baking ingredients" is light brown sugar. The most popular product in "dog food care" is Organix grain free chicken & vegetable dog food. 
+
+
+Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
+#### Visualizing mean hour of orders for Pink Lady Apples and Coffee Ice Cream on each day of the week
+```{r, mean_hour}
 
 
 
 ```
 
-
-Make a table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. Include the number of times each item is ordered in your table.
-
-
-Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
 
 
 
