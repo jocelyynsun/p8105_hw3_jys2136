@@ -76,28 +76,58 @@ The graph above shows the number of items ordered among aisles that have over 10
 
 pop_aisles =
   instacart %>%
+  janitor::clean_names() %>%
   filter(aisle == c("baking ingredients", 
                     "dog food care", 
                     "packaged vegetable fruits")) %>%
   group_by(aisle) %>%
   count(product_name) %>%
   rename("frequency" = n) %>%
-  mutate(product_rank =  min_rank(desc(frequency))) %>%
+  mutate(product_rank =  min_rank(desc(frequency)),
+         product_name = tolower(product_name)) %>%
   filter(product_rank < 4) %>%
   arrange(aisle, product_rank)
   
- knitr::kable(pop_aisles, caption = "**Table 1: Most popular items in the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”**") 
+ knitr::kable(pop_aisles, caption = "**Table 1: Top three purchased items in aisles “baking ingredients” and “dog food care”**") 
 
 ```
 
-The table above shows the most popular items in the specified aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. In the _instacart_ dataset, We can see that there is no data on aisle “packaged vegetables fruits”. There is data on aisles "baking ingredients" and "dog food care". The most popular product in "baking ingredients" is light brown sugar. The most popular product in "dog food care" is Organix grain free chicken & vegetable dog food. 
+The table above shows the most popular items in the specified aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. In the _instacart_ dataset, We can see that there is no data on aisle “packaged vegetables fruits”. There is data on aisles "baking ingredients" and "dog food care". The most popular product in "baking ingredients" is light brown sugar. The most popular product in "dog food care" is organix grain free chicken & vegetable dog food. 
 
 
 Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
+
 #### Visualizing mean hour of orders for Pink Lady Apples and Coffee Ice Cream on each day of the week
-```{r, mean_hour}
+```{r, mean_hour, echo = FALSE, message = FALSE}
+
+mean_hour = 
+  instacart %>%
+  mutate(product_name = tolower(product_name),
+           order_dow = recode(order_dow,
+                            "0" = "Sunday",
+                            "1" = "Monday",
+                            "2" = "Tuesday",
+                            "3" = "Wednesday",
+                            "4" = "Thursday",
+                            "5" = "Friday",
+                            "6" = "Saturday")) %>%
+  filter(product_name %in% c("pink lady apples", "coffee ice cream")) %>%
+  group_by(product_name, order_dow) %>%
+  summarize(hour = mean(order_hour_of_day)) %>%
+  pivot_wider(names_from = order_dow,
+              values_from = hour)
+  
+  knitr::kable(mean_hour, 
+               digits = 2, 
+               caption = "**Table 2: Mean hour of  orders for pink lady apples and coffee ice cream on each day of the week**")
+
+```
 
 
+# Problem 2
+```{r}
+
+data(BRFSS)
 
 ```
 
