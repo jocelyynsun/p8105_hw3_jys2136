@@ -69,7 +69,6 @@ ggsave("aisle_plot.pdf", aisle_plot, width = 8, height = 5)
     
 ```
 
-**need to add figure legend**
 The graph above shows the number of items ordered among aisles that have over 10,000 items ordered, respectively. The frequency of ordered items according to aisle category are ordered from least to greatest, left to right. We can see that the most popular aisles are _fresh vegetables_ and _fresh fruits_. This is consistent with the findings in the section on [Most popular aisles and number of ordered items].
 
 
@@ -96,8 +95,6 @@ pop_aisles =
 
 The table above shows the most popular items in the specified aisles “baking ingredients”, _dog food care_, and _packaged vegetables fruits_. In the **_instacart_** dataset, We can see that there is no data on aisle _packaged vegetables fruits_. There is data on aisles _baking ingredients_ and _dog food care_. The most popular product in _baking ingredients_ is _light brown sugar_. The most popular product in _dog food care_ is _organix grain free chicken & vegetable dog food_. 
 
-
-Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
 
 #### Visualizing mean hour of orders for Pink Lady Apples and Coffee Ice Cream on each day of the week
 ```{r, mean_hour, echo = FALSE, message = FALSE}
