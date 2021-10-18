@@ -125,36 +125,69 @@ mean_hour =
 
 ```
 
-This problem uses the BRFSS data. DO NOT include this dataset in your local data directory; instead, load the data from the p8105.datasets package.
-
-First, do some data cleaning:
-
-format the data to use appropriate variable names;
-focus on the “Overall Health” topic
-include only responses from “Excellent” to “Poor”
-organize responses as a factor taking levels ordered from “Poor” to “Excellent”
-Using this dataset, do or answer the following (commenting on the results of each):
 
 # Problem 2
-```{r, brfss}
+
+## Data for Behavioral Risk Factors Surveillance System for Selected Metropolitan Area Risk Trends (SMART) (2002-2010)
+
+#### Cleaning the data:
+```{r, brfss, warning = FALSE}
 
 data("brfss_smart2010") 
 
-brfss_df = 
+clean_brfss = 
   brfss_smart2010 %>%
   janitor::clean_names() %>%
   filter(topic == "Overall Health",
          response %in% c("Excellent", "Very Good", "Good", "Poor")) %>%
-  mutate(response = factor(response, levels = c("Excellent", "Very Good", "Good", "Poor")))
+  mutate(response = factor(response, levels = c("Excellent", "Very Good", "Good", "Poor"))) %>%
+  separate(locationdesc, c("state", "location", "rest")) %>%
+  unite(location, c("location", "rest")) %>%
+  arrange(response)
+
+```
+
+
+#### Which states were observed at 7 or more locations in 2002 & 2010
+```{r, brfss_2002}
+
+brfss_2002 = 
+  clean_brfss %>%
+  filter(year == "2002") %>%
+  group_by(state) %>%
+  distinct(location) %>% #unique() does not work here
+  count(state) %>%
+  rename("observations" = "n") %>%
+  filter(observations > 6)
+
+brfss_2010 = 
+  clean_brfss %>%
+  filter(year == "2010") %>%
+  group_by(state) %>%
+  distinct(location) %>% #unique() does not work here
+  count(state) %>%
+  rename("observations" = "n") %>%
+  filter(observations > 6)
+
+```
+
+In 2002, the following states were observed at 7 or more locations: `r brfss_2002 %>% magrittr::extract2("state")`.
+
+In 2010, the following states were observed at 7 or more locations: `r brfss_2010 %>% magrittr::extract2("state")`.
+
+
+
+Construct a dataset that is limited to Excellent responses, and contains, year, state, and a variable that averages the data_value across locations within a state. Make a “spaghetti” plot of this average value over time within a state (that is, make a plot showing a line for each state across years – the geom_line geometry and group aesthetic will help).
+```{r}
 
 
 
 ```
 
 
-In 2002, which states were observed at 7 or more locations? What about in 2010?
-Construct a dataset that is limited to Excellent responses, and contains, year, state, and a variable that averages the data_value across locations within a state. Make a “spaghetti” plot of this average value over time within a state (that is, make a plot showing a line for each state across years – the geom_line geometry and group aesthetic will help).
 Make a two-panel plot showing, for the years 2006, and 2010, distribution of data_value for responses (“Poor” to “Excellent”) among locations in NY State.
+```{r}
 
+```
 
 
