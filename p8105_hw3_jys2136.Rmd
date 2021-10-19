@@ -166,14 +166,18 @@ brfss_2010 =
   rename("observations" = "n") %>%
   filter(observations > 6)
 
+brfss_2002
+
+brfss_2010
+
 ```
 
-In 2002, the following states were observed at 7 or more locations: `r brfss_2002 %>% magrittr::extract2("state")`.
+In 2002, the following states were observed at 7 or more locations: **`r brfss_2002 %>% magrittr::extract2("state")`**.
 
-In 2010, the following states were observed at 7 or more locations: `r brfss_2010 %>% magrittr::extract2("state")`.
+In 2010, the following states were observed at 7 or more locations: **`r brfss_2010 %>% magrittr::extract2("state")`**.
 
-Construct a dataset that is limited to Excellent responses, and contains, year, state, and a variable that averages the data_value across locations within a state. Make a “spaghetti” plot of this average value over time within a state (that is, make a plot showing a line for each state across years – the geom_line geometry and group aesthetic will help).
-```{r, spaghetti_plot}
+#### Constructing a spaghetti plot
+```{r, spaghetti_plot, echo = FALSE, message = FALSE}
 
 brfss_lmtd = 
   clean_brfss %>%
@@ -181,12 +185,73 @@ brfss_lmtd =
   group_by(state, year) %>%
   summarise(mean_data_value = mean(data_value, na.rm = TRUE))
 
+lmtd_plot = 
+  ggplot(brfss_lmtd, aes(x = year,
+                         y = mean_data_value,
+                         color = state)) +
+  geom_line(alpha = 0.3, aes(group = state, color = state)) +
+  geom_point(alpha = 0.3, aes(group = state, color = state)) +
+  labs(
+    x = "Year",
+    y = "Number of observations in each state",
+    title = "Observations in states (2002-2010)") + 
+  viridis::scale_color_viridis(name = "state", discrete = T) +
+  theme(axis.text.x = element_text(family = "Helvetica", size = 9),
+        axis.text.y = element_text(family = "Helvetica", size = 9),
+        plot.title = element_text(family = "Helvetica", face = "bold", size = 12, hjust = 0.5))
+
+lmtd_plot
+
+ggsave("spaghetti_plot.pdf", lmtd_plot, width = 8, height = 5)
+
+```
+
+The plot above shows that the majority of states had more than 10 observed locations in during the years 2002 - 2010.
+
+#### Comparing the distribution of mean data values between 2006 and 2010 within the state of NY
+```{r, two_panel_plot, echo =  FALSE, message = FALSE}
+brfss_dist = 
+  clean_brfss %>% 
+  filter(year %in% c(2006, 2010),
+         state == "NY") %>% 
+  group_by(year, response) %>% 
+  summarise(mean_data_value = mean(data_value, na.rm = T))
+
+# Bar graph of mean data value distribution 
+brfss_dist_plot =
+  brfss_dist %>%
+  ggplot(aes(x = response, 
+               y = mean_data_value, 
+               fill = response)) + 
+    geom_col(position = "dodge") + 
+    labs( x = "Response Level",
+          y = "Data Value",
+          title = "Distribution of mean data value for responses among locations in NY") +
+    theme_bw() + 
+    theme(axis.text.x = element_text(family = "Helvetica", size = 9),
+        axis.text.y = element_text(family = "Helvetica", size = 9),
+        plot.title = element_text(family = "Helvetica", face = "bold", size = 12, hjust = 0.5)) +
+    facet_grid(. ~ year)
+
+brfss_dist_plot
+
+ggsave("distr_plot_1.pdf", brfss_dist_plot, width = 8, height = 5)
+
 ```
 
 
-Make a two-panel plot showing, for the years 2006, and 2010, distribution of data_value for responses (“Poor” to “Excellent”) among locations in NY State.
-```{r}
+# Problem 3
+
+## Accelerometer Data
+```{r, loading_accel_data}
+
+accel_df = read_csv("data/accel_data.csv")
 
 ```
+
+
+
+
+
 
 
