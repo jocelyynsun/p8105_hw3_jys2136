@@ -151,7 +151,7 @@ clean_brfss =
 
 
 #### Which states were observed at 7 or more locations in 2002 & 2010
-```{r, brfss_2002}
+```{r, brfss_2002, echo = FALSE}
 
 brfss_2002 = 
   clean_brfss %>%
@@ -277,16 +277,16 @@ clean_accel =
 
 The cleaned accelerator data set contains `r nrow(clean_accel)` observations and `r ncol(clean_accel)` variables.   
 
-The variables record the following information for each observation: 
-* `week` : the week count, a numeric vector
-* `day_id`: the day count, a numeric vector
-* `day`: the day of the week, a factor vector with 7 levels associated with each day of the week
-* `minute`: the minute of activity, a numeric vector
-* `activity_count`: the activity counts for each minute of a 24-hour day starting at midnight, a numeric value
-* `weekend_indicator`: a weekend indicator, a logic vector (TRUE if a weekend, FALSE if a weekday)
+The variables record the following information for each observation: \
+  - `week` : the week count, a numeric vector \
+  - `day_id`: the day count, a numeric vector \
+  - `day`: the day of the week, a factor vector with 7 levels associated with each day of the week \
+  - `minute`: the minute of activity, a numeric vector \
+  - `activity_count`: the activity counts for each minute of a 24-hour day starting at midnight, a numeric value \
+  - `weekend_indicator`: a weekend indicator, a logic vector (TRUE if a weekend, FALSE if a weekday)
 
 #### Total activity 
-```{r, total_activity, echo = FALSE, message = FALSE}
+```{r, total_activity, echo = FALSE, warning = FALSE, message = FALSE}
 
 total_activity = 
   clean_accel %>% 
@@ -303,8 +303,12 @@ knitr::kable(total_activity_table, align = "cccccccc", caption = "**Table 4: Tot
 
 ```
 
+From the table, we can see that the Saturdays in weeks 4 & 5 have the lowest value of 1440. However, it is interesting to note that this is the same value across two weeks, while all other data appear to be different.
+
+There is no immediate, distinguishable trend based on Table 4. A plot that shows the distribution of the data for total activity across the 5 weeks may provide a better idea. 
+
 #### Average activity with a day (24 hours)
-```{r, plot_24hr_activity, echo = FALSE, message = FALSE}
+```{r, plot_24hr_activity, echo = FALSE, warning = FALSE, message = FALSE}
 
 activity_24hr = 
   clean_accel %>% 
@@ -313,9 +317,9 @@ activity_24hr =
     ggplot(aes(x = minute, y = avg_value, color = day)) +
     geom_smooth(se = FALSE) +
     scale_x_discrete(limit = c(240, 480, 720, 960, 1200, 1440), 
-                     labels = c("4AM", "8AM", "12PM", "4PM", "8PM", "12AM")) +
+                     labels = c("4", "8", "12", "16", "20", "24")) +
     labs(
-      title = "Fig. 5: Average activity within a 24 hour period  \n for each day of the week",
+      title = "Fig. 4: Average activity within a 24 hour period  \n for each day of the week",
       x = "Time of day",
       y = "Average activity counts",
       color = "Day of the Week") +
@@ -330,6 +334,7 @@ ggsave("activity_24hr.pdf", activity_24hr, width = 8, height = 5)
   
 ```
 
+On average, the activity count rises between 4 to 20 hours from the start of the study and falls after 20 hours from the start of the study. Based on this data, we can infer that the most activity is seen during the day, and where the average activity counts decrease marks the time of night or sleep. The exception is Friday, where we see some peak activity occurring later in the hours of the study, between 20 - 24 hours. The most activity, on average, is seen Monday between 8 - 12 hours from the start of the study. 
 
 
 
