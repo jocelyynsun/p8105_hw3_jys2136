@@ -301,21 +301,6 @@ total_activity_table =
 
 knitr::kable(total_activity_table, align = "cccccccc", caption = "**Table 4: Total activity by day of the week**")
 
-total_activity_dist =  
-  total_activity %>%
-  ggplot(aes(x = day, y = total_activity_counts, color = day)) +
-  geom_col() +
-  theme_bw() + 
-  theme(axis.text.x = element_text(family = "Helvetica",
-                                     size = 9, 
-                                     angle = 60, 
-                                     hjust = 1),
-          axis.text.y = element_text(family = "Helvetica"),
-          plot.title = element_text(family = "Helvetica", face = "bold", size = 12, hjust = 0.5))
-  
-
-total_activity_dist
-
 ```
 
 #### Average activity with a day (24 hours)
