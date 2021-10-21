@@ -9,8 +9,6 @@ output: github_document
 
 library(tidyverse)
 library(p8105.datasets)
-library(httr)
-library(jsonlite)
 
 ```
 
@@ -20,7 +18,7 @@ library(jsonlite)
 ## Instacart Data
 
 #### Most popular aisles and number of ordered items
-```{r, instacart_aisle_count, echo = TRUE, message = FALSE}
+```{r, instacart_aisle_count, echo = FALSE, message = FALSE}
 
 data("instacart")
 
@@ -32,12 +30,16 @@ n_aisle =
 
 
 # Looking at the first few rows of data to see which aisles(s) are the most items ordered from:
-head(n_aisle, 5)
+n_aisle_lmtd = 
+  head(n_aisle, 5)
+
+knitr::kable(n_aisle_lmtd, align = "lc")
+
 
 ```
 
 #### Data description
-The data set **_instacart_** has has `r ncol(instacart)` variables and `r nrow(instacart)` observations. 
+The dataset **instacart** has has `r ncol(instacart)` variables and `r nrow(instacart)` observations. 
 
 There are `r nrow(n_aisle)` aisles and as we can see in the output provided above, the aisles where the most items are ordered from are _fresh vegetables_ and _fresh fruits_, with `r n_aisle[1,2]` number of items being ordered from _fresh vegetables_ and `r n_aisle[2,2]` number of items being ordered from _fresh fruits_.
 
@@ -54,14 +56,16 @@ aisle_plot =
   ggplot(
     aes(x = aisle, y = n)) +
     labs(y = "No. of Items Ordered",
-         x = "Aisle Name") +
+         x = "Aisle Name",
+         title = "Fig. 1: Aisles with over 10,000 items ordered from Instacart") +
     geom_bar(stat = "identity", fill = "steelblue") +
     theme_bw() + 
     theme(axis.text.x = element_text(family = "Helvetica",
                                      size = 9, 
                                      angle = 60, 
                                      hjust = 1),
-          axis.text.y = element_text(family = "Helvetica"))
+          axis.text.y = element_text(family = "Helvetica"),
+          plot.title = element_text(family = "Helvetica", face = "bold", size = 12, hjust = 0.5))
 
 aisle_plot
 
@@ -80,7 +84,7 @@ pop_aisles =
   janitor::clean_names() %>%
   filter(aisle == c("baking ingredients", 
                     "dog food care", 
-                    "packaged vegetable fruits")) %>%
+                    "packaged vegetables fruits")) %>%
   group_by(aisle) %>%
   count(product_name) %>%
   rename("frequency" = n) %>%
@@ -89,11 +93,11 @@ pop_aisles =
   filter(product_rank < 4) %>%
   arrange(aisle, product_rank)
   
- knitr::kable(pop_aisles, caption = "**Table 1: Top three purchased items in aisles “baking ingredients” and “dog food care”**") 
+knitr::kable(pop_aisles, caption = "**Table 1: Top three purchased items in aisles “baking ingredients” and “dog food care”**") 
 
 ```
 
-The table above shows the most popular items in the specified aisles “baking ingredients”, _dog food care_, and _packaged vegetables fruits_. In the **_instacart_** dataset, We can see that there is no data on aisle _packaged vegetables fruits_. There is data on aisles _baking ingredients_ and _dog food care_. The most popular product in _baking ingredients_ is _light brown sugar_. The most popular product in _dog food care_ is _organix grain free chicken & vegetable dog food_. 
+The table above shows the most popular items in the specified aisles **_baking ingredients_**, **_dog food care_**, and **_packaged vegetables fruits_**. In the **instacart** dataset, the most popular product in **_baking ingredients_** is _light brown sugar_. The most popular product in **_dog food care_** is _organix grain free chicken & vegetable dog food_, and the most popular product in **_packaged vegetables fruits_** is _organic baby spinach_.
 
 
 #### Visualizing mean hour of orders for Pink Lady Apples and Coffee Ice Cream on each day of the week
@@ -122,6 +126,7 @@ mean_hour =
 
 ```
 
+From the table above, we can generally conclude that _coffee ice cream_ tends to be ordered later in the day compared to orders of _pink lady apples_. The only exception is Friday where we see that the orders for either item come in around the same average time of the day. 
 
 # Problem 2
 
@@ -161,15 +166,14 @@ brfss_2010 =
   clean_brfss %>%
   filter(year == "2010") %>%
   group_by(state) %>%
-  distinct(location) %>% #unique() does not work here
+  distinct(location) %>% 
   count(state) %>%
   rename("observations" = "n") %>%
   filter(observations > 6)
 
-brfss_2002
+knitr::kable(list(brfss_2002, brfss_2010), align = "cr", caption = "Table 3: States with observations at 7 or more locations 2002 (left) & 2010 (right)")
 
-brfss_2010
-
+  
 ```
 
 In 2002, the following states were observed at 7 or more locations: **`r brfss_2002 %>% magrittr::extract2("state")`**.
@@ -193,9 +197,10 @@ lmtd_plot =
   geom_point(alpha = 0.3, aes(group = state, color = state)) +
   labs(
     x = "Year",
-    y = "Number of observations in each state",
-    title = "Observations in states (2002-2010)") + 
+    y = "Mean data value",
+    title = "Fig. 2: Mean data value in states (2002-2010)") + 
   viridis::scale_color_viridis(name = "state", discrete = T) +
+  theme_bw() + 
   theme(axis.text.x = element_text(family = "Helvetica", size = 9),
         axis.text.y = element_text(family = "Helvetica", size = 9),
         plot.title = element_text(family = "Helvetica", face = "bold", size = 12, hjust = 0.5))
@@ -206,31 +211,32 @@ ggsave("spaghetti_plot.pdf", lmtd_plot, width = 8, height = 5)
 
 ```
 
-The plot above shows that the majority of states had more than 10 observed locations in during the years 2002 - 2010.
+The plot above shows the mean data values for states that had excellent responses over the years 2002 - 2010.
 
-#### Comparing the distribution of mean data values between 2006 and 2010 within the state of NY
+
+#### Comparing the mean data values between 2006 and 2010 within the state of NY
 ```{r, two_panel_plot, echo =  FALSE, message = FALSE}
+
 brfss_dist = 
   clean_brfss %>% 
   filter(year %in% c(2006, 2010),
          state == "NY") %>% 
-  group_by(year, response) %>% 
-  summarise(mean_data_value = mean(data_value, na.rm = T))
+  group_by(year, response)
 
-# Bar graph of mean data value distribution 
+# Box plot of data distribution in 2006 & 2010
 brfss_dist_plot =
-  brfss_dist %>%
-  ggplot(aes(x = response, 
-               y = mean_data_value, 
-               fill = response)) + 
-    geom_col(position = "dodge") + 
-    labs( x = "Response Level",
-          y = "Data Value",
-          title = "Distribution of mean data value for responses among locations in NY") +
+  ggplot(brfss_dist,aes(x = response, y = data_value, color = response)) +
+    geom_boxplot() +
+    labs(y = "Data Values",
+         x = "Responses",
+         title = "Fig. 3: Comparison of data values of responses in NY \n (2006 & 2010)") +
     theme_bw() + 
-    theme(axis.text.x = element_text(family = "Helvetica", size = 9),
-        axis.text.y = element_text(family = "Helvetica", size = 9),
-        plot.title = element_text(family = "Helvetica", face = "bold", size = 12, hjust = 0.5)) +
+    theme(axis.text.x = element_text(family = "Helvetica",
+                                     size = 9, 
+                                     angle = 60, 
+                                     hjust = 1),
+          axis.text.y = element_text(family = "Helvetica"),
+          plot.title = element_text(family = "Helvetica", face = "bold", size = 10, hjust = 0.5)) +
     facet_grid(. ~ year)
 
 brfss_dist_plot
@@ -238,18 +244,106 @@ brfss_dist_plot
 ggsave("distr_plot_1.pdf", brfss_dist_plot, width = 8, height = 5)
 
 ```
-
+Above is a comparison of the distribution of data values of responses "Excellent" to "Poor" among locations in NY between the years 2006 and 2010.
 
 # Problem 3
 
 ## Accelerometer Data
-```{r, loading_accel_data}
 
-accel_df = read_csv("data/accel_data.csv")
+This dataset reflects five weeks of accelerometer data collected on a 63 year-old male with BMI 25, who was admitted to the Advanced Cardiac Care Center of Columbia University Medical Center and diagnosed with congestive heart failure (CHF).
+
+#### Cleaning the data
+```{r, clean_accel_data, message = FALSE}
+
+clean_accel = 
+  read_csv("data/accel_data.csv") %>% 
+  pivot_longer(
+    cols = activity.1:activity.1440,
+    names_to = "minute",
+    values_to = "activity_counts",
+    names_prefix = "activity.") %>% 
+  mutate(
+    minute = as.numeric(minute),
+    day = factor(day, levels = c("Monday", 
+                                 "Tuesday", 
+                                 "Wednesday",
+                                 "Thursday", 
+                                 "Friday", 
+                                 "Saturday", 
+                                 "Sunday")),
+    weekend_indicator = (day == "Saturday" | day == "Sunday"))
 
 ```
 
+The cleaned accelerator data set contains `r nrow(clean_accel)` observations and `r ncol(clean_accel)` variables.   
 
+The variables record the following information for each observation: 
+* `week` : the week count, a numeric vector
+* `day_id`: the day count, a numeric vector
+* `day`: the day of the week, a factor vector with 7 levels associated with each day of the week
+* `minute`: the minute of activity, a numeric vector
+* `activity_count`: the activity counts for each minute of a 24-hour day starting at midnight, a numeric value
+* `weekend_indicator`: a weekend indicator, a logic vector (TRUE if a weekend, FALSE if a weekday)
+
+#### Total activity 
+```{r, total_activity, echo = FALSE, message = FALSE}
+
+total_activity = 
+  clean_accel %>% 
+  group_by(day, week) %>% 
+  summarize(total_activity_counts = sum(activity_counts))
+
+total_activity_table =
+  total_activity %>%
+  pivot_wider(
+    names_from = day,
+    values_from = total_activity_counts)
+
+knitr::kable(total_activity_table, align = "cccccccc", caption = "**Table 4: Total activity by day of the week**")
+
+total_activity_dist =  
+  total_activity %>%
+  ggplot(aes(x = day, y = total_activity_counts, color = day)) +
+  geom_col() +
+  theme_bw() + 
+  theme(axis.text.x = element_text(family = "Helvetica",
+                                     size = 9, 
+                                     angle = 60, 
+                                     hjust = 1),
+          axis.text.y = element_text(family = "Helvetica"),
+          plot.title = element_text(family = "Helvetica", face = "bold", size = 12, hjust = 0.5))
+  
+
+total_activity_dist
+
+```
+
+#### Average activity with a day (24 hours)
+```{r, plot_24hr_activity, echo = FALSE, message = FALSE}
+
+activity_24hr = 
+  clean_accel %>% 
+    group_by(day, minute) %>% 
+    summarize(avg_value = mean(activity_counts)) %>% 
+    ggplot(aes(x = minute, y = avg_value, color = day)) +
+    geom_smooth(se = FALSE) +
+    scale_x_discrete(limit = c(240, 480, 720, 960, 1200, 1440), 
+                     labels = c("4AM", "8AM", "12PM", "4PM", "8PM", "12AM")) +
+    labs(
+      title = "Fig. 5: Average activity within a 24 hour period  \n for each day of the week",
+      x = "Time of day",
+      y = "Average activity counts",
+      color = "Day of the Week") +
+    theme_bw() + 
+    theme(axis.text.x = element_text(family = "Helvetica"),
+           axis.text.y = element_text(family = "Helvetica"),
+           plot.title = element_text(family = "Helvetica", face = "bold", size = 10, hjust = 0.5)) 
+
+activity_24hr
+
+ggsave("activity_24hr.pdf", activity_24hr, width = 8, height = 5)
+  
+```
 
 
 
